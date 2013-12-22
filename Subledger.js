@@ -8,16 +8,20 @@
     subledger.Identity.Create().then(function(response){
         // Store your identity id and secret
         // To use your identity for next calls call:
-
+        console.log(response);
         var my_id = response.result.active_key.id;
         var my_secret = response.result.active_key.secret;
+
         subledger.initialize(my_id, my_secret);
 
         // Create an org
 
         return subledger.Org.Create(description, reference)
     }).then(function(response){
+
+        console.log(response);
             // Store your Org id
+
             var org_id = response.result.active_org.id;
             subledger.setOrgId(org_id);
 
@@ -25,6 +29,7 @@
 
            return subledger.Book.Create(description, reference)
     }).then(function(response){
+        console.log(response);
         // Store your book Id
         var book_id = response.result.active_book.id;
         subledger.setBookId(book_id);
@@ -70,14 +75,13 @@ var api;
 var Identity = function(identity, key){
     this.identity = identity;
     this.key = key;
-
 }
 // Create a new identity
 
 Identity.Create = function(email, description, reference){
     var promise = new Parse.Promise()
     Parse.Cloud.httpRequest({
-        url: url+"identities",
+        url: url+"/identities",
         method: "POST",
         params: {
             email: email,
@@ -450,7 +454,7 @@ var Subledger = function(id, secret, org_id, book_id){
     
 };
 
-Subledger.Indentity = Identity;
+Subledger.prototype.Identity = Identity;
 Subledger.prototype.Org = Org;
 Subledger.prototype.Book = Book;
 Subledger.prototype.Account = Account;
@@ -543,107 +547,5 @@ Subledger.prototype.POST = function(endpoint, params){
 Subledger.prototype.PATCH = function(endpoint, params){
     return this.HTTPRequest("PATCH", endpoint, params);
 };
-
-/*
-Subledger.CreateIdentity = function(email, description, reference){
-    var promise = new Parse.Promise()
-    Parse.Cloud.httpRequest({
-        url: url+"identities",
-        method: "POST",
-        params: {
-            email: email,
-            description: description,
-            reference: reference
-        },
-         success: function(httpResponse){
-            if (httpResponse.data) {
-                promise.resolve(httpResponse.data);
-            }else{
-                promise.reject(httpResponse.text);
-            }
-        },
-        error: function(httpResponse){
-            promise.reject(httpResponse.data);
-        }
-    }); 
-    return promise;
-};
-
-
-Subledger.prototype.bookEndpoint = function(){
-    return "orgs/"+this.org_id+"/books/"+this.book_id+"/";
-};
-
-Subledger.prototype.fullEndpoint = function(endpoint){
-    return this.bookEndpoint()+endpoint;
-};
-
-Subledger.prototype.createOrg = function(description, reference){
-    var params = {
-        description: description,
-        reference: reference    
-    };
-    return this.POST("orgs", params); 
-};
-
-Subledger.prototype.createBook = function(description, reference){
-    var params = {
-        description: description,
-        reference: reference    
-    };
-    return this.POST("orgs/"+this.org_id+"/books", params); 
-};
-
-Subledger.prototype.createAccountCategory = function(normal_balance,
-description, reference){
-    var params = {
-        normal_balance: normal_balance,
-        description: description,
-        reference: reference
-    };
-    return this.POST(this.fullEndpoint("categories"), params);
-};
-
-Subledger.prototype.createAccount = function(normal_balance, 
-description, reference){
-    var params = {
-        normal_balance: normal_balance,
-        description: description,
-        reference: reference
-    };
-    return this.POST(this.fullEndpoint("accounts"), params);
-};
-
-Subledger.prototype.attatchAccountToCategory = function(category_id,
-account_id){
-    var params = {
-        account : account_id
-    };
-    var url = this.fullEndpoint("categories/"+category_id+"/attach");
-    return this.POST(url, params);
-};
-
-Subledger.prototype.createEntry = function(effective_at, description, reference, lines){
-    var params = {
-        effective_at : effective_at,
-        description : description,
-        reference: reference,
-        lines: lines
-    }
-    var str = JSON.stringify(params);
-    console.log(str);
-    return this.POST(this.fullEndpoint("journal_entries/create_and_post"),
-str);
-};
-
-Subledger.prototype.accountBalance = function(account_id, date){
-    return this.GET(this.fullEndpoint("accounts/"+account_id+"/balance"), {
-        at : date
-    });
-};
-
-Subledger.prototype.accountHistory = function(account_id, params){
-    return this.GET(this.fullEndpoint("accounts/"+account_id+"/lines"), params);
-};*/
 
 module.exports = Subledger;
