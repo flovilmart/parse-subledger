@@ -5,7 +5,12 @@ Subledger connector for Parse
 
 Check documentation here:
 
-http://subledger.com/docs/
+http://api.subledger.com/
+
+The full api is implemented now 
+
+Check Subledger.js for documentation
+
 
 TODO:
 
